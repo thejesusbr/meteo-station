@@ -1,0 +1,16 @@
+    <script>
+      // Your web app's Firebase configuration
+      let firebaseConfig = {
+        apiKey: "AIzaSyBHJMkI16NabrrenO7GXdBAj4jKFl5lDjY",
+        authDomain: "esp8266-meteo.firebaseapp.com",
+        databaseURL: "https://esp8266-meteo.firebaseio.com",
+        projectId: "esp8266-meteo",
+        storageBucket: "esp8266-meteo.appspot.com",
+        messagingSenderId: "221459699079",
+        appId: "1:221459699079:web:b820495c2b64abaf"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      let db = firebase.firestore();
+      
+  </script>
