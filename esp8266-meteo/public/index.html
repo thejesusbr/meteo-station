@@ -12,10 +12,11 @@
     <script defer src="/__/firebase/6.5.0/firebase-firestore.js"></script>
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
+    <script defer src="dewPointLUT.js"></script>
     <script defer src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
     <script defer src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <script>
+    <script type="text/javascript">
       (adsbygoogle = window.adsbygoogle || []).push({
         google_ad_client: "ca-pub-2174160974655109",
         enable_page_level_ads: true
@@ -25,7 +26,8 @@
       let chart = null;
       window.onload = function () {
         CanvasJS.addColorSet("safeColorSet", ['#1b9e77','#d95f02','#7570b3']);
-        chart = new CanvasJS.Chart("chart", { 
+        chart = new CanvasJS.Chart("chart", {
+          zoomEnabled: true,
           colorSet: "safeColorSet",
           title: {
             text: "Meteorological data from Varginha-MG",
@@ -35,15 +37,30 @@
           },
           axisX: {
             labelFontFamily: "Roboto, Liberation Sans, Helvetica, sans-serif",
-            labelFontSize: 12
+            labelFontSize: 12,
+            interval: 2, 
+            intervalType: "hour",
+            valueFormatString: "D/M HH:MM"
           },
-          axisY: {        
+          axisY: [{
+            title: "Temp and Humidity",
+            titleFontColor: "#1b9e77",      
+            labelFontColor: "#1b9e77",
+            labelFontFamily: "Roboto, Liberation Sans, Helvetica, sans-serif",
+            labelFontSize: 14,  
             interval: 15,
             interlacedColor: "#ECEFF1",
-            labelFontFamily: "Roboto, Liberation Sans, Helvetica, sans-serif",
-            labelFontSize: 12,
             gridColor: "#ECEFF1"
           },
+          {
+            title: "Air Pressure",
+            titleFontColor: "#7570b3",
+            labelFontColor: "#7570b3",
+            labelFontSize: 14,
+            interval: 1,
+            minimum: 90,
+            maximum: 100
+          }],
           legend: {
             verticalAlign: "top",  // "top" , "bottom"
             horizontalAlign: "center",
@@ -60,6 +77,7 @@
               dataPoints: []
             },
             {
+              //axisYIndex: 1,
               type: "spline",
               markerType: "none",
               showInLegend: true, 
@@ -68,6 +86,7 @@
               dataPoints: []
             },
             {
+              axisYIndex: 1,
               type: "spline",
               markerType: "none",
               showInLegend: true, 
@@ -121,10 +140,10 @@
           rootRef = db.collection("meteo-data").doc("measurements");
           docRef = rootRef.collection("2787533171657860");
           const now = Date.now();
-          ontem = now - 24 * 60 * 60 * 1000;
+          ontem = now - 48 * 60 * 60 * 1000;
           ontem = new Date(ontem);
-          const last24Hours = ontem.toISOString();
-          query = docRef.where("timestamp", ">", last24Hours).orderBy("timestamp", "desc");
+          const last48Hours = ontem.toISOString();
+          query = docRef.where("timestamp", ">", last48Hours).orderBy("timestamp", "desc");
           query.onSnapshot(function(querySnapshot) {
             meteo_data = []   
             querySnapshot.forEach(function(doc) {
@@ -158,9 +177,9 @@
             meteo_data.reverse();
             meteo_data.forEach(function(data) {
               today = isoStringToBRDate(data[0])
-              tPoint = {y: data[1], label: today};
-              hPoint = {y: data[2], label: today};
-              pPoint = {y: data[3], label: today};
+              tPoint = {x: new Date(data[0]), y: data[1]};
+              hPoint = {x: new Date(data[0]), y: data[2]};
+              pPoint = {x: new Date(data[0]), y: data[3]};
               chart.options.data[0].dataPoints.push(tPoint);
               chart.options.data[1].dataPoints.push(hPoint);
               chart.options.data[2].dataPoints.push(pPoint);
@@ -181,8 +200,8 @@
       <div id="message" class="message">
         <h1>IoT Meteorologic Station</h1>
         <h2>Monitor my public IoT weather station!</h2>
-        <p>This site is a frontpage for a small IoT project built for studying purposes. It monitors a micro weather station built with a Wemos D1 Mini development board, featuring an ESP8266 microcontroller and some sensors. The station logs its readings to a Google Cloud Firestore real-time database every minute. Here, we see the last reading values and the minimum and maximum of the last 24 hours.</p>
-        <p>There is also a chart showing the variation within the last 24 hours. Enjoy!</p>
+        <p>This site is a frontpage for a small IoT project built for studying purposes. It monitors a micro weather station built with a Wemos D1 Mini development board, featuring an ESP8266 microcontroller and some sensors. The station logs its readings to a Google Cloud Firestore real-time database every minute. Here, we see the last reading values and the minimum and maximum of the last 48 hours.</p>
+        <p>There is also a chart showing the variation within the last 48 hours. You can drag the cursor on the chart to zoom in data. Enjoy!</p>
       </div>
       <div id="dash" class="dash">
         <div class="widget">
@@ -205,7 +224,7 @@
               <div>Max</div>
             </div>
           </div>
-          <div class="info-text">Min and max in the last 24h</div>
+          <div class="info-text">Min and max in the last 48h</div>
         </div>
         <div class="widget">
           <h2>Humidity</h2>
@@ -227,7 +246,7 @@
               <div>Max</div>
             </div>
           </div>
-          <div class="info-text">Min and max in the last 24h</div>
+          <div class="info-text">Min and max in the last 48h</div>
         </div>
         <div class="widget">
           <h2>Pressure</h2>
@@ -249,7 +268,7 @@
               <div>Max</div>
             </div>
           </div>
-          <div class="info-text">Min and max in the last 24h</div>
+          <div class="info-text">Min and max in the last 48h</div>
         </div>
       </div>
       <div class="chart" id="chart"></div>
