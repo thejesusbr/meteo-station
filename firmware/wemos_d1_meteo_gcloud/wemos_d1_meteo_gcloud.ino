@@ -27,19 +27,20 @@
 #endif
 
 // Defining DHT sensor model and pin
-#define DHTTYPE DHT11   // DHT Shield uses DHT 11
+#define DHTTYPE DHT21   // DHT Shield uses DHT 11
 #define DHTPIN D4       // DHT Shield uses pin D4
+#define DHTPPIN D6  // DHP Power pin
 
 // Initialize DHT sensor
 // Note that older versions of this library took an optional third parameter to
 // tweak the timings for faster processors.  This parameter is no longer needed
 // as the current DHT reading algorithm adjusts itself to work on faster procs.
-DHT dht(DHTPIN, DHTTYPE);
+//DHT dht(DHTPIN, DHTTYPE);
 
 // Initialize BMP180 sensor class
 Adafruit_BMP085 bmp;
 
-float humidity, temperature, pressure;       // Raw float values from the sensor
+float humidity, temperature, temperature_dht, temperature_bmp, pressure;       // Raw float values from the sensor
 char str_humidity[10], str_temperature[10];  // Rounded sensor values and as strings
 
 // Generally, you should use "unsigned long" for variables that hold time
@@ -60,15 +61,28 @@ void read_sensors() {
     // Save the last time you read the sensor
     // last_millis = current_millis;
     readDHT();
-  }
-  readBmp();
+    readBmp();
+  }  
 }
 
 void readDHT(){
+  // Power the DHT
+  Serial.println("Powering DHT up...");
+  digitalWrite(DHTPPIN, HIGH);
+  delay(1000);
+
+  Serial.println("Initializing DHT...");
+  DHT dht(DHTPIN, DHTTYPE);
+  dht.begin();
+  delay(15000);
+  
   // Reading temperature and humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (it's a very slow sensor)
   humidity = dht.readHumidity();        // Read humidity as a percent
-  temperature = dht.readTemperature();  // Read temperature as Celsius
+  temperature_dht = dht.readTemperature();  // Read temperature as Celsius
+
+  Serial.println("Powering DHT down...");
+  digitalWrite(DHTPPIN, LOW);
 
   // Check if any reads failed and exit early (to try again).
   if (isnan(humidity) || isnan(temperature)) {
@@ -91,7 +105,9 @@ void readDHT(){
 void readBmp(){
   pressure = bmp.readPressure()/1000.0;
   Serial.print("Temperatura (BMP): ");
-  Serial.print(bmp.readTemperature());
+  temperature_bmp = bmp.readTemperature();
+  temperature = (temperature_bmp + temperature_dht) / 2.0;
+  Serial.print(temperature_bmp);
   Serial.println("  °C");
  
   Serial.print("Pressao (BMP): ");
@@ -123,7 +139,12 @@ void setup()
   Serial.begin(115200);
   delay(100);
   Serial.println();
-  dht.begin();
+  pinMode(DHTPPIN, OUTPUT);
+  digitalWrite(DHTPPIN,LOW);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
+  
+  //dht.begin();
   // Initializing the BMP180 sensor.
   if (!bmp.begin()) 
   {
@@ -134,7 +155,7 @@ void setup()
   Serial.println("WeMos Meteorology Station");
   Serial.println("");
   setupCloudIoT(); // Creates globals for MQTT
-  pinMode(LED_BUILTIN, OUTPUT);
+  
   read_sensors();
   send_data();
 }
@@ -159,4 +180,5 @@ void loop()
     read_sensors();
     send_data();
   }
+  digitalWrite(LED_BUILTIN, HIGH);
 }
