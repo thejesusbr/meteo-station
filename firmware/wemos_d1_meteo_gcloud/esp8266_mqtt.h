@@ -16,7 +16,7 @@
 #ifndef __ESP8266_MQTT_H__
 #define __ESP8266_MQTT_H__
 #include <ESP8266WiFi.h>
-#include "FS.h"
+#include "LittleFS.h"
 #include "WiFiClientSecureBearSSL.h"
 #include <time.h>
 
@@ -72,15 +72,15 @@ void setupCert()
   // netClient->setTrustAnchors(&certList);
   // return;
 
-  // If using the (preferred) method with the cert in /data (SPIFFS)
+  // If using the (preferred) method with the cert in /data (LittleFS)
 
-  if (!SPIFFS.begin())
+  if (!LittleFS.begin())
   {
     Serial.println("Failed to mount file system");
     return;
   }
 
-  File ca = SPIFFS.open("/primary.crt", "r");
+  File ca = LittleFS.open("/primary.crt", "r");
   if (!ca)
   {
     Serial.println("Failed to open ca file");
@@ -91,7 +91,7 @@ void setupCert()
     certList.append(strdup(ca.readString().c_str()));
   }
 
-  ca = SPIFFS.open("/backup.crt", "r");
+  ca = LittleFS.open("/backup.crt", "r");
   if (!ca)
   {
     Serial.println("Failed to open ca file");
