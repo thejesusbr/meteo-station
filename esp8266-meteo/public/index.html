@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>IoT Meteorologic Station</title>
 
     <!-- update the version number as needed -->
@@ -13,19 +13,29 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
     <script defer src="dewPointLUT.js"></script>
-    <script defer src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
-    <script defer src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script
+      defer
+      src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"
+    ></script>
+    <script
+      defer
+      src="https://canvasjs.com/assets/script/canvasjs.min.js"
+    ></script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2174160974655109"
+      crossorigin="anonymous"
+    ></script>
     <script type="text/javascript">
       (adsbygoogle = window.adsbygoogle || []).push({
         google_ad_client: "ca-pub-2174160974655109",
-        enable_page_level_ads: true
+        enable_page_level_ads: true,
       });
     </script>
     <script type="text/javascript">
       let chart = null;
       window.onload = function () {
-        CanvasJS.addColorSet("safeColorSet", ['#1b9e77','#d95f02','#7570b3']);
+        CanvasJS.addColorSet("safeColorSet", ["#1b9e77", "#d95f02", "#7570b3"]);
         chart = new CanvasJS.Chart("chart", {
           zoomEnabled: true,
           colorSet: "safeColorSet",
@@ -33,73 +43,75 @@
             text: "Meteorological data from Varginha-MG",
             fontFamily: "Google Sans, Roboto, sans-serif",
             fontSize: 24,
-            fontWeight: 300
+            fontWeight: 300,
           },
           axisX: {
             labelFontFamily: "Roboto, Liberation Sans, Helvetica, sans-serif",
             labelFontSize: 12,
-            interval: 2, 
+            interval: 2,
             intervalType: "hour",
-            valueFormatString: "D/M HH:MM"
+            valueFormatString: "D/M HH:MM",
           },
-          axisY: [{
-            title: "Temp and Humidity",
-            titleFontColor: "#1b9e77",      
-            labelFontColor: "#1b9e77",
-            labelFontFamily: "Roboto, Liberation Sans, Helvetica, sans-serif",
-            labelFontSize: 14,  
-            interval: 15,
-            interlacedColor: "#ECEFF1",
-            gridColor: "#ECEFF1"
-          },
-          {
-            title: "Air Pressure",
-            titleFontColor: "#7570b3",
-            labelFontColor: "#7570b3",
-            labelFontSize: 14,
-            interval: 1,
-            minimum: 90,
-            maximum: 100
-          }],
+          axisY: [
+            {
+              title: "Temp and Humidity",
+              titleFontColor: "#1b9e77",
+              labelFontColor: "#1b9e77",
+              labelFontFamily: "Roboto, Liberation Sans, Helvetica, sans-serif",
+              labelFontSize: 14,
+              interval: 15,
+              interlacedColor: "#ECEFF1",
+              gridColor: "#ECEFF1",
+            },
+            {
+              title: "Air Pressure",
+              titleFontColor: "#7570b3",
+              labelFontColor: "#7570b3",
+              labelFontSize: 14,
+              interval: 1,
+              minimum: 90,
+              maximum: 100,
+            },
+          ],
           legend: {
-            verticalAlign: "top",  // "top" , "bottom"
+            verticalAlign: "top", // "top" , "bottom"
             horizontalAlign: "center",
             fontFamily: "Roboto, Liberation Sans, Helvetica, sans-serif",
-            fontSize: 14
+            fontSize: 14,
           },
           data: [
             {
               type: "spline",
               markerType: "none",
-              showInLegend: true, 
+              showInLegend: true,
               name: "temp",
               legendText: "Temperature (°C)",
-              dataPoints: []
+              dataPoints: [],
             },
             {
               //axisYIndex: 1,
               type: "spline",
               markerType: "none",
-              showInLegend: true, 
+              showInLegend: true,
               name: "humi",
               legendText: "Humidity (%)",
-              dataPoints: []
+              dataPoints: [],
             },
             {
               axisYIndex: 1,
               type: "spline",
               markerType: "none",
-              showInLegend: true, 
+              showInLegend: true,
               name: "pres",
               legendText: "Pressure (kPa)",
-              dataPoints: []
-            }
-          ]
-          });
-        chart.render();  
-        }
-        
-      function isoStringToBRDate(input){
+              dataPoints: [],
+            },
+          ],
+        });
+        chart.render();
+      };
+
+      function isoStringToBRDate(input) {
         dateObj = new Date(input);
         hour = dateObj.getHours();
         minute = dateObj.getMinutes();
@@ -107,20 +119,20 @@
         mm = dateObj.getMonth() + 1; //January is 0!
         yyyy = dateObj.getFullYear();
         if (dd < 10) {
-          dd = '0' + dd;
-        } 
-        if (mm < 10) {
-          mm = '0' + mm;
+          dd = "0" + dd;
         }
-        if(minute < 10) {
-          minute = '0' + minute;
-        } 
-        today = dd + '/' + mm + '/' + yyyy + ' ' + hour + ':' + minute;
+        if (mm < 10) {
+          mm = "0" + mm;
+        }
+        if (minute < 10) {
+          minute = "0" + minute;
+        }
+        today = dd + "/" + mm + "/" + yyyy + " " + hour + ":" + minute;
         return today;
       }
       let meteo_data = [];
       let docRef;
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener("DOMContentLoaded", function () {
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
         // // The Firebase SDK is initialized and available here!
         //
@@ -130,56 +142,97 @@
         // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
         //
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        
+
         try {
           let app = firebase.app();
-          let features = ['auth', 'database'].filter(feature => typeof app[feature] === 'function');
-          document.getElementById('load').innerHTML = `Built with Firebase SDK.`;
+          let features = ["auth", "database"].filter(
+            (feature) => typeof app[feature] === "function"
+          );
+          document.getElementById(
+            "load"
+          ).innerHTML = `Built with Firebase SDK.`;
           db = firebase.firestore();
-          
+
           rootRef = db.collection("meteo-data").doc("measurements");
           docRef = rootRef.collection("2787533171657860");
           const now = Date.now();
           ontem = now - 48 * 60 * 60 * 1000;
           ontem = new Date(ontem);
           const last48Hours = ontem.toISOString();
-          query = docRef.where("timestamp", ">", last48Hours).orderBy("timestamp", "desc");
-          query.onSnapshot(function(querySnapshot) {
-            meteo_data = []   
-            querySnapshot.forEach(function(doc) {
-                meteo_data.push([doc.data().timestamp, doc.data().temperature, doc.data().humidity, doc.data().pressure])
+          query = docRef
+            .where("timestamp", ">", last48Hours)
+            .orderBy("timestamp", "desc");
+          query.onSnapshot(function (querySnapshot) {
+            meteo_data = [];
+            querySnapshot.forEach(function (doc) {
+              meteo_data.push([
+                doc.data().timestamp,
+                doc.data().temperature,
+                doc.data().humidity,
+                doc.data().pressure,
+              ]);
             });
             $("#temp-now").text(meteo_data[0][1].toFixed(1));
             $("#humi-now").text(meteo_data[0][2]);
             $("#pres-now").text(meteo_data[0][3].toFixed(2));
             $(".last-date").text(isoStringToBRDate(meteo_data[0][0]));
-            $("#max-temp").text(Math.max.apply(Math, meteo_data.map(function (i) {
-              return i[1];
-            })));
-            $("#min-temp").text(Math.min.apply(Math, meteo_data.map(function (i) {
-              return i[1];
-            })));
-            $("#max-humi").text(Math.max.apply(Math, meteo_data.map(function (i) {
-              return i[2];
-            })));
-            $("#min-humi").text(Math.min.apply(Math, meteo_data.map(function (i) {
-              return i[2];
-            })));
-            $("#max-pres").text(Math.max.apply(Math, meteo_data.map(function (i) {
-              return i[3];
-            })));
-            $("#min-pres").text(Math.min.apply(Math, meteo_data.map(function (i) {
-              return i[3];
-            })));
+            $("#max-temp").text(
+              Math.max.apply(
+                Math,
+                meteo_data.map(function (i) {
+                  return i[1];
+                })
+              )
+            );
+            $("#min-temp").text(
+              Math.min.apply(
+                Math,
+                meteo_data.map(function (i) {
+                  return i[1];
+                })
+              )
+            );
+            $("#max-humi").text(
+              Math.max.apply(
+                Math,
+                meteo_data.map(function (i) {
+                  return i[2];
+                })
+              )
+            );
+            $("#min-humi").text(
+              Math.min.apply(
+                Math,
+                meteo_data.map(function (i) {
+                  return i[2];
+                })
+              )
+            );
+            $("#max-pres").text(
+              Math.max.apply(
+                Math,
+                meteo_data.map(function (i) {
+                  return i[3];
+                })
+              )
+            );
+            $("#min-pres").text(
+              Math.min.apply(
+                Math,
+                meteo_data.map(function (i) {
+                  return i[3];
+                })
+              )
+            );
             chart.options.data[0].dataPoints = [];
             chart.options.data[1].dataPoints = [];
             chart.options.data[2].dataPoints = [];
             meteo_data.reverse();
-            meteo_data.forEach(function(data) {
-              today = isoStringToBRDate(data[0])
-              tPoint = {x: new Date(data[0]), y: data[1]};
-              hPoint = {x: new Date(data[0]), y: data[2]};
-              pPoint = {x: new Date(data[0]), y: data[3]};
+            meteo_data.forEach(function (data) {
+              today = isoStringToBRDate(data[0]);
+              tPoint = { x: new Date(data[0]), y: data[1] };
+              hPoint = { x: new Date(data[0]), y: data[2] };
+              pPoint = { x: new Date(data[0]), y: data[3] };
               chart.options.data[0].dataPoints.push(tPoint);
               chart.options.data[1].dataPoints.push(hPoint);
               chart.options.data[2].dataPoints.push(pPoint);
@@ -188,20 +241,30 @@
           });
         } catch (e) {
           console.error(e);
-          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+          document.getElementById("load").innerHTML =
+            "Error loading the Firebase SDK, check the console.";
         }
       });
     </script>
-    <link rel="stylesheet" type="text/css" href="main.css">
-
+    <link rel="stylesheet" type="text/css" href="main.css" />
   </head>
   <body>
     <div id="main">
       <div id="message" class="message">
         <h1>IoT Meteorologic Station</h1>
         <h2>Monitor my public IoT weather station!</h2>
-        <p>This site is a frontpage for a small IoT project built for studying purposes. It monitors a micro weather station built with a Wemos D1 Mini development board, featuring an ESP8266 microcontroller and some sensors. The station logs its readings to a Google Cloud Firestore real-time database every minute. Here, we see the last reading values and the minimum and maximum of the last 48 hours.</p>
-        <p>There is also a chart showing the variation within the last 48 hours. You can drag the cursor on the chart to zoom in data. Enjoy!</p>
+        <p>
+          This site is a frontpage for a small IoT project built for studying
+          purposes. It monitors a micro weather station built with a Wemos D1
+          Mini development board, featuring an ESP8266 microcontroller and some
+          sensors. The station logs its readings to a Google Cloud Firestore
+          real-time database every minute. Here, we see the last reading values
+          and the minimum and maximum of the last 48 hours.
+        </p>
+        <p>
+          There is also a chart showing the variation within the last 48 hours.
+          You can drag the cursor on the chart to zoom in data. Enjoy!
+        </p>
       </div>
       <div id="dash" class="dash">
         <div class="widget">
@@ -276,10 +339,12 @@
     <div id="footer">
       <p class="load" id="load">Firebase SDK Loading&hellip;</p>
       <p class="load">
-        This site is a toy project to study how to deploy IoT solutions using Google Cloud facilities.
+        This site is a toy project to study how to deploy IoT solutions using
+        Google Cloud facilities.
       </p>
       <p class="load">
-        Developed by <a href="https://bit.ly/2lZgwoK">Prof. Wendell Diniz</a>. This project is in Github (coming soon).
+        Developed by <a href="https://bit.ly/2lZgwoK">Prof. Wendell Diniz</a>.
+        This project is in Github (coming soon).
       </p>
     </div>
   </body>

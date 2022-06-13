@@ -14,15 +14,17 @@
  *****************************************************************************/
 // This file contains your configuration used to connect to Cloud IoT Core
 
-// WIFI
-const char* ssid     = "diniz";
-const char* password = "AYIX49Q1J4BUYJ95B4D4";
+// Chip ID (last 3 fields of the MAC address)
+String chipId = String(ESP.getChipId(), HEX);
+String stationName = String("ESPMeteoStation_")+chipId;
+String did = String("esp-meteo-")+chipId;
 
 // Cloud iot details.
 const char* project_id = "esp8266-meteo";
 const char* location = "us-central1";
 const char* registry_id = "esp8266-meteo-reg";
 const char* device_id = "esp8266-meteo-dev";
+//const char* device_id = did.c_str();
 
 // Configuration for NTP
 const char* ntp_primary = "pool.ntp.org";

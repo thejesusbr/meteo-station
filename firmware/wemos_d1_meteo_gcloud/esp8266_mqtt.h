@@ -31,7 +31,7 @@
 // Place your message handler code here.
 void messageReceived(String &topic, String &payload)
 {
-  Serial.println("Incoming: " + topic + " - " + payload);
+  Serial.println("Incoming: " + topic + " -> " + payload);
 }
 ///////////////////////////////
 
@@ -105,34 +105,6 @@ void setupCert()
   netClient->setTrustAnchors(&certList);
 }
 
-void setupWifi()
-{
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.println("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(100);
-  }
-
-  configTime(0, 0, ntp_primary, ntp_secondary);
-  Serial.println("Waiting on time sync...");
-  while (time(nullptr) < 1510644967)
-  {
-    delay(10);
-  }
-}
-
-void connectWifi()
-{
-  Serial.print("checking wifi..."); // TODO: Necessary?
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    Serial.print(".");
-    delay(1000);
-  }
-}
-
 ///////////////////////////////
 // Orchestrates various methods from preceeding code.
 ///////////////////////////////
@@ -171,7 +143,13 @@ void setupCloudIoT()
 
   // ESP8266 WiFi setup
   netClient = new WiFiClientSecure();
-  setupWifi();
+  //setupWifi();
+  configTime(0, 0, ntp_primary, ntp_secondary);
+  Serial.println("Waiting on time sync...");
+  while (time(nullptr) < 1510644967)
+  {
+    delay(10);
+  }
 
   // ESP8266 WiFi secure initialization
   setupCert();
